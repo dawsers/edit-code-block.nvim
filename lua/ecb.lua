@@ -93,7 +93,8 @@ M.edit_org_code_block = function ()
     if child:named() then
       if field == 'name' then
         name = child
-      elseif field == 'parameter' then
+      -- Only want the first parameter, which is the language name
+      elseif field == 'parameter' and not parameter then
         parameter = child
       elseif field == 'contents' then
         contents = child
