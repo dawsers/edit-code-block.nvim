@@ -1,0 +1,52 @@
+* edit-code-block.nvim
+
+** Introduction
+
+=edit-code-block.nvim= is an extension for /Neovim/ that uses /tree-sitter/
+to parse code injections in any type of file that supports them, and provides
+an edit buffer with the code block and the correct file type, so the edit
+can use language dependent tools like LSP. It can be downloaded
+[[https://github.com/dawsers/edit-code-block.nvim][here]].
+
+It supports language blocks that are embedded in =markdown=, =javascript= or
+=css= blocks in =HTML=, etc. The only requirement is to have the tree-sitter
+parsers installed for those languages.
+
+The plugin uses =tree-sitter='s =LanguageTree= through the =lua=
+=vim.treesitter.languagetool= module to detect injected language blocks in
+the parent file, and, when invoked, it generates a buffer with the contents of
+the block that contains the cursor. The buffer is linked to the parent, so when
+you save it (=:w=), the changes go to the parent. The buffer can be hidden and
+reused later, or discarded with the usual commands.
+
+** Requirements
+
+=edit-code-block.nvimm= requires a version of /Neovim/ with a recent =tree-sitter=
+version enabled (probably 0.8 or newer, I tested it on 0.9). It doesn't depend on
+any other extensions. But, of course, you need to have enabled in your configuration
+all the /tree-sitter/ parsers for the languages you will use. For example, if you
+are interested in =markdown=, =lua=, and =python=, you need to enable the
+three parsers in your /Neovim/ configuration.
+
+** Installation and Configuration
+
+Install using [[https://github.com/junegunn/vim-plug][Plug]].
+
+#+BEGIN_SRC vim
+Plug 'dawsers/edit-code-block.nvim'
+#+END_SRC
+
+and setup and configure using /lua/:
+
+#+BEGIN_SRC lua
+require('ecb').setup()
+#+END_SRC
+
+
+** Commands
+
+| *Command*          | *Description*                             |
+|--------------------+-------------------------------------------|
+| =EditCodeBlock=    | Open the block in a vertical split window |
+
+There are no default key bindings.
