@@ -28,7 +28,7 @@ local function create_edit_buffer(mdbufnr, row, col, srow, scol, erow, filetype)
   vim.api.nvim_buf_set_option(bufnr, 'modified', false)
   vim.api.nvim_win_set_buf(win, bufnr)
   -- Calculate cursor position in new window
-  vim.api.nvim_win_set_cursor(win, { row - srow, col - scol })
+  vim.api.nvim_win_set_cursor(win, { row - srow, col })
 
   -- Auto commands to update main buffer
   vim.api.nvim_create_autocmd({'BufWrite', 'BufWriteCmd'}, {
@@ -56,8 +56,12 @@ M.edit_code_block = function ()
   if not file_parser then
     return
   end
+  -- Ensure the file gets parsed. Neovim doesn't re-parse the file on changes
+  -- unless the tree-sitter highlighter is enabled
+  file_parser:parse()
+  
   local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-  local range = { row, col, row, col }
+  local range = { row - 1, col, row - 1, col }
   local ltree = file_parser:language_for_range(range)
   if not ltree then
     return
@@ -75,6 +79,14 @@ M.edit_code_block = function ()
 end
 
 M.edit_org_code_block = function ()
+  local file_parser = vim.treesitter.get_parser()
+  if not file_parser then
+    return
+  end
+  -- Ensure the file gets parsed. Neovim doesn't re-parse the file on changes
+  -- unless the tree-sitter highlighter is enabled
+  file_parser:parse()
+  
   local node = vim.treesitter.get_node()
   if not node then
     return
