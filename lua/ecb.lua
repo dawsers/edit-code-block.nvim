@@ -10,6 +10,7 @@ M.setup = function()
 end
 
 local function create_edit_buffer(mdbufnr, row, col, srow, scol, erow, filetype)
+  local mwin = vim.api.nvim_get_current_win()
   local lines = vim.api.nvim_buf_get_lines(mdbufnr, srow, erow, false)
   vim.cmd('split')
   local win = vim.api.nvim_get_current_win()
@@ -34,8 +35,10 @@ local function create_edit_buffer(mdbufnr, row, col, srow, scol, erow, filetype)
   vim.api.nvim_create_autocmd({'BufWrite', 'BufWriteCmd'}, {
     buffer = bufnr,
     callback = function()
+      local crow, ccol = unpack(vim.api.nvim_win_get_cursor(0))
       local nlines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, true)
       vim.api.nvim_buf_set_lines(mdbufnr, srow, erow, true, nlines)
+      vim.api.nvim_win_set_cursor(mwin, { crow + srow, ccol })
       -- Set as not modified
       vim.api.nvim_buf_set_option(bufnr, 'modified', false)
     end,

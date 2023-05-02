@@ -12,6 +12,40 @@ It supports language blocks that are embedded in =markdown=, =javascript= or
 =css= blocks in =HTML=, etc. The only requirement is to have the tree-sitter
 parsers installed for those languages.
 
+There is a limitation. There can only be one language per line. The plugin
+extracts whole lines from the original buffer, so to make sure things work,
+use it in blocks like this:
+
+#+BEGIN_SRC html
+<head>
+  <script
+    type="text/javascript">
+      $(document).ready(function () {
+        $('#foo').click(function () {
+          alert('OK');
+        });
+      })
+  </script>
+
+  <style>
+    body {
+      color: blue;
+      background-color: red;
+    }
+  </style>
+</head>
+#+END_SRC
+
+instead of like this:
+
+#+BEGIN_SRC html
+<head>
+  <script type="text/javascript"> $(document).ready(function() { $('#foo').click(function() { alert('OK'); }); }) </script>
+
+  <style> body { color: blue; background-color: red; } </style>
+</head>
+#+END_SRC
+
 The plugin uses =tree-sitter='s =LanguageTree= through the =lua=
 =vim.treesitter.languagetool= module to detect injected language blocks in
 the parent file, and, when invoked, it generates a buffer with the contents of
@@ -45,8 +79,9 @@ require('ecb').setup()
 
 ** Commands
 
-| *Command*          | *Description*                             |
-|--------------------+-------------------------------------------|
-| =EditCodeBlock=    | Open the block in a vertical split window |
+| *Command*          | *Description*                                      |
+|--------------------+----------------------------------------------------|
+| =EditCodeBlock=    | Open the block in a vertical split window          |
+| =EditOrgCodeBlock= | Open the org-mode block in a vertical split window |
 
 There are no default key bindings.
