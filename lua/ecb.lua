@@ -1,18 +1,22 @@
 local M = {}
+local wincmd = 'split'
 
 local create_commands = function()
   vim.api.nvim_create_user_command('EditCodeBlock', function() require('ecb').edit_code_block() end, { desc = 'edit embedded code block in new window' })
   vim.api.nvim_create_user_command('EditOrgCodeBlock', function() require('ecb').edit_org_code_block() end, { desc = 'edit embedded org mode code block in new window' })
 end
 
-M.setup = function()
+M.setup = function(opts)
   create_commands()
+  if opts.wincmd then
+    wincmd = opts.wincmd
+  end
 end
 
 local function create_edit_buffer(mdbufnr, row, col, srow, scol, erow, filetype)
   local mwin = vim.api.nvim_get_current_win()
   local lines = vim.api.nvim_buf_get_lines(mdbufnr, srow, erow, false)
-  vim.cmd('split')
+  vim.cmd(wincmd)
   local win = vim.api.nvim_get_current_win()
   local bufnr = vim.api.nvim_create_buf(true, false)
   -- Set buffer options
