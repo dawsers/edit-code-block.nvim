@@ -2,8 +2,24 @@ local M = {}
 local wincmd = 'split'
 
 local create_commands = function()
-  vim.api.nvim_create_user_command('EditCodeBlock', function() require('ecb').edit_code_block() end, { desc = 'edit embedded code block in new window' })
-  vim.api.nvim_create_user_command('EditOrgCodeBlock', function() require('ecb').edit_org_code_block() end, { desc = 'edit embedded org mode code block in new window' })
+  vim.api.nvim_create_user_command('EditCodeBlock',
+    function(opts) require('ecb').edit_code_block(opts) end,
+    {
+      nargs = '*',
+      complete = function(ArgLead, CmdLine, cursorPos)
+        return { "split", "vsplit", "tabnew", "rightbelow", "leftabove" }
+      end,
+      desc = 'edit embedded code block in new window'
+    })
+  vim.api.nvim_create_user_command('EditOrgCodeBlock',
+    function(opts) require('ecb').edit_org_code_block(opts) end,
+    {
+      nargs = '*',
+      complete = function(ArgLead, CmdLine, cursorPos)
+        return { "split", "vsplit", "tabnew", "rightbelow", "leftabove" }
+      end,
+      desc = 'edit embedded org mode code block in new window'
+    })
 end
 
 M.setup = function(opts)
@@ -13,10 +29,10 @@ M.setup = function(opts)
   end
 end
 
-local function create_edit_buffer(mdbufnr, row, col, srow, scol, erow, filetype)
+local function create_edit_buffer(win_cmd, mdbufnr, row, col, srow, scol, erow, filetype)
   local mwin = vim.api.nvim_get_current_win()
   local lines = vim.api.nvim_buf_get_lines(mdbufnr, srow, erow, false)
-  vim.cmd(wincmd)
+  vim.cmd(win_cmd)
   local win = vim.api.nvim_get_current_win()
   local bufnr = vim.api.nvim_create_buf(true, false)
   -- Set buffer options
@@ -58,7 +74,13 @@ local function create_edit_buffer(mdbufnr, row, col, srow, scol, erow, filetype)
   })
 end
 
-M.edit_code_block = function ()
+M.edit_code_block = function (opts)
+  local win_cmd
+  if opts.args then
+    win_cmd = opts.args
+  else
+    win_cmd = wincmd
+  end
   local file_parser = vim.treesitter.get_parser()
   if not file_parser then
     return
@@ -80,12 +102,18 @@ M.edit_code_block = function ()
     if vim.treesitter.node_contains(node, range) then
       local mdbufnr = vim.fn.bufnr()
       local srow, scol, erow, _ = node:range(false)
-      create_edit_buffer(mdbufnr, row, col, srow, scol, erow, ltree:lang())
+      create_edit_buffer(win_cmd, mdbufnr, row, col, srow, scol, erow, ltree:lang())
     end
   end
 end
 
-M.edit_org_code_block = function ()
+M.edit_org_code_block = function (opts)
+  local win_cmd
+  if opts.args then
+    win_cmd = opts.args
+  else
+    win_cmd = wincmd
+  end
   local file_parser = vim.treesitter.get_parser()
   if not file_parser then
     return
@@ -131,7 +159,7 @@ M.edit_org_code_block = function ()
       if contents then
         srow, scol, erow, ecol = contents:range(false)
         local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-        create_edit_buffer(mdbufnr, row, col, srow, scol, erow, language)
+        create_edit_buffer(win_cmd, mdbufnr, row, col, srow, scol, erow, language)
       end
     end
   end
