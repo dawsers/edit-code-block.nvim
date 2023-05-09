@@ -12,46 +12,16 @@ It supports language blocks that are embedded in =markdown=, =javascript= or
 =css= blocks in =HTML=, etc. The only requirement is to have the tree-sitter
 parsers installed for those languages.
 
-There is a limitation. There can only be one language per line. The plugin
-extracts whole lines from the original buffer, so to make sure things work,
-use it in blocks like this:
-
-#+BEGIN_SRC html
-<head>
-  <script
-    type="text/javascript">
-      $(document).ready(function () {
-        $('#foo').click(function () {
-          alert('OK');
-        });
-      })
-  </script>
-
-  <style>
-    body {
-      color: blue;
-      background-color: red;
-    }
-  </style>
-</head>
-#+END_SRC
-
-instead of like this:
-
-#+BEGIN_SRC html
-<head>
-  <script type="text/javascript"> $(document).ready(function() { $('#foo').click(function() { alert('OK'); }); }) </script>
-
-  <style> body { color: blue; background-color: red; } </style>
-</head>
-#+END_SRC
-
 The plugin uses =tree-sitter='s =LanguageTree= through the =lua=
 =vim.treesitter.languagetool= module to detect injected language blocks in
 the parent file, and, when invoked, it generates a buffer with the contents of
 the block that contains the cursor. The buffer is linked to the parent, so when
 you save it (=:w=), the changes go to the parent. The buffer can be hidden and
 reused later, or discarded with the usual commands.
+
+For languages not supported by Treesitter, or parsers that don't provide code
+injection queries, you can still select some text and specify the file type to
+apply (=EditCodeBlockSelection=).
 
 ** Requirements
 
@@ -81,10 +51,11 @@ require('ecb').setup {
 
 ** Commands
 
-| *Command*          | *Description*                                             |
-|--------------------+-----------------------------------------------------------|
-| =EditCodeBlock=    | Open the block in a window specified by ~wincmd~          |
-| =EditOrgCodeBlock= | Open the org-mode block in a window specified by ~wincmd~ |
+| *Command*                | *Description*                                             |
+|--------------------------+-----------------------------------------------------------|
+| =EditCodeBlock=          | Open the block in a window specified by ~wincmd~          |
+| =EditCodeBlockOrg=       | Open the org-mode block in a window specified by ~wincmd~ |
+| =EditCodeBlockSelection= | Open the selection in a window specified by ~wincmd~ |
 
 Both =EditCodeBlock= and =EditOrgCodeBlock= accept an optional argument to
 override the default =wincmd=, and provide auto-completion for those arguments.
@@ -98,6 +69,16 @@ For example:
 ...
 #+END_SRC
 
+=EditCodeBlockSelection= works on selections, and requires at least one
+argument, the file type to apply to the new buffer. Additional arguments are
+understood as the =wincmd=
+
+#+BEGIN_SRC vim
+:'<,'>EditCodeBlockSelection lua
+:'<,'>EditCodeBlockSelection python tabnew
+:'<,'>EditCodeBlockSelection cpp rightbelow split
+...
+#+END_SRC
 
 There are no default key bindings.
 
