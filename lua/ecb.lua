@@ -76,7 +76,7 @@ end
 
 M.edit_code_block = function (opts)
   local win_cmd
-  if opts.args then
+  if opts and opts.args then
     win_cmd = opts.args
   else
     win_cmd = wincmd
@@ -109,7 +109,7 @@ end
 
 M.edit_org_code_block = function (opts)
   local win_cmd
-  if opts.args then
+  if opts and opts.args then
     win_cmd = opts.args
   else
     win_cmd = wincmd
