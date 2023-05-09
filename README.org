@@ -73,15 +73,17 @@ Plug 'dawsers/edit-code-block.nvim'
 and setup and configure using /lua/:
 
 #+BEGIN_SRC lua
-require('ecb').setup()
+require('ecb').setup {
+  wincmd = 'split', -- this is the default way to open the code block window
+}
 #+END_SRC
 
 
 ** Commands
 
-| *Command*          | *Description*                                      |
-|--------------------+----------------------------------------------------|
-| =EditCodeBlock=    | Open the block in a vertical split window          |
-| =EditOrgCodeBlock= | Open the org-mode block in a vertical split window |
+| *Command*          | *Description*                                             |
+|--------------------+-----------------------------------------------------------|
+| =EditCodeBlock=    | Open the block in a window specified by ~wincmd~          |
+| =EditOrgCodeBlock= | Open the org-mode block in a window specified by ~wincmd~ |
 
 There are no default key bindings.
